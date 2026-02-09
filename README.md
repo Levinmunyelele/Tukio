@@ -171,10 +171,9 @@ SECRET_KEY=your_jwt_secret
 - [ ] **Public Event Page:** Mobile-responsive page for users to buy tickets.
 - [ ] **Gatekeeper App:** Simple mobile view for scanning QR codes at the door.
 
-## 📞 Contact
+---
 
 ## 📞 Contact
-
 **Levin Munyelele** Full-Stack Developer | Data Scientist  
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/levin-munyelele/) [![Portfolio](https://img.shields.io/badge/Portfolio-View%20Projects-teal?style=for-the-badge&logo=github)](https://levinmunyelele.github.io/portfolio/)
