@@ -173,12 +173,10 @@ SECRET_KEY=your_jwt_secret
 
 ## 📞 Contact
 
+## 📞 Contact
+
 **Levin Munyelele** Full-Stack Developer | Data Scientist  
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/levin-munyelele/) [![Portfolio]
-
-(https://img.shields.io/badge/Portfolio-View%20Projects-teal?style=for-the-badge&logo=github)](https://levinmunyelele.github.io/portfolio/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/levin-munyelele/) [![Portfolio](https://img.shields.io/badge/Portfolio-View%20Projects-teal?style=for-the-badge&logo=github)](https://levinmunyelele.github.io/portfolio/)
 
 📧 **Email:** [munyelelelevin@gmail.com](mailto:munyelelelevin@gmail.com)
-
-
