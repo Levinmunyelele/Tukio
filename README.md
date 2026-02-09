@@ -90,7 +90,15 @@ erDiagram
         string phone_number
     }
 ```
+---
+### 📝 Database Table Details
 
+| Table | Role | Key Fields & Constraints |
+| :--- | :--- | :--- |
+| **Users** | Manages authentication and authorization. | `id` (PK), `email` (Unique), `role` (Enum: 'admin', 'organizer', 'user'). |
+| **Events** | Stores event metadata managed by organizers. | `organizer_id` (FK -> Users), `capacity` (Integer), `price` (Decimal). |
+| **Tickets** | The core asset linking a User to an Event. | `qr_hash` (Unique Index), `status` (Enum: 'VALID', 'USED'), `event_id` (FK). |
+| **Transactions** | Audit log for M-Pesa payments. | `mpesa_receipt_number` (Unique), `amount`, `phone_number`. |
 ---
 
 ## 🔌 API Documentation (Core Endpoints)
@@ -145,17 +153,32 @@ MPESA_PASSKEY=your_passkey
 SECRET_KEY=your_jwt_secret
 ```
 ---
-## 🚧 Roadmap
-[x] Database Design & Schema
-[x] FastAPI Project Structure
-[ ] M-Pesa Sandbox Integration
-[ ] QR Code Generation Service
-[ ] React Dashboard UI
-[ ] Email Notification System
+## 🚧 Project Roadmap
+
+### Phase 1: Core Architecture (Current Status)
+- [x] **Database Design:** Normalized schema for Users, Events, and Tickets.
+- [x] **Backend Setup:** FastAPI project structure with SQLAlchemy and Alembic migrations.
+- [x] **Authentication:** JWT-based login for Organizers and Staff.
+- [ ] **M-Pesa Integration:** Implement STK Push and Callback handling (Webhooks).
+
+### Phase 2: The Ticket Engine
+- [ ] **QR Service:** Generate cryptographically signed QR codes for each ticket.
+- [ ] **Validation API:** Endpoint for bouncers to scan and verify tickets.
+- [ ] **Email Service:** Auto-send tickets to users after payment confirmation.
+
+### Phase 3: Frontend & UI
+- [ ] **Organizer Dashboard:** React charts showing sales and revenue.
+- [ ] **Public Event Page:** Mobile-responsive page for users to buy tickets.
+- [ ] **Gatekeeper App:** Simple mobile view for scanning QR codes at the door.
 
 ## 📞 Contact
+
 **Levin Munyelele** Full-Stack Developer | Data Scientist  
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/levin-munyelele/) [![Portfolio](https://img.shields.io/badge/Portfolio-View%20Projects-teal?style=for-the-badge&logo=github)](https://levinmunyelele.github.io/portfolio/)
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/levin-munyelele/) [![Portfolio]
+
+(https://img.shields.io/badge/Portfolio-View%20Projects-teal?style=for-the-badge&logo=github)](https://levinmunyelele.github.io/portfolio/)
+
 📧 **Email:** [munyelelelevin@gmail.com](mailto:munyelelelevin@gmail.com)
 
 
