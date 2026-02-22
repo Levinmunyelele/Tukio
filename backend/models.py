@@ -33,3 +33,16 @@ class Transaction(Base):
     phone_number = Column(String)
     amount = Column(Integer)
     status = Column(String)  # e.g., "Completed", "Failed", "Cancelled"
+
+class Ticket(Base):
+    __tablename__ = "tickets"
+
+    id = Column(Integer, primary_key=True, index=True)
+    ticket_hash = Column(String, unique=True, index=True) # E.g., TUK-001
+    event_id = Column(Integer, ForeignKey("events.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    status = Column(String, default="VALID") # Can be changed to "USED" at the gate
+
+    # Relationships
+    event = relationship("Event")
+    owner = relationship("User")
