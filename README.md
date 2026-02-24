@@ -11,10 +11,9 @@
 ## 🚀 Key Features
 
 * **⚡ Instant M-Pesa Payments:** Seamless integration with Safaricom Daraja API (STK Push) for friction-less checkout.
-* **🔒 Secure QR Ticketing:** Each ticket generates a unique, signed QR code that can only be scanned once.
-* **📊 Organizer Dashboard:** Real-time analytics on ticket sales, revenue, and attendance.
-* **📱 Gatekeeper Mode:** A dedicated mobile interface for event bouncers to scan and validate tickets in <1 second.
-* **📩 Automated Delivery:** Tickets are emailed instantly upon successful payment callback.
+* **📡 Real-Time Delivery:** Utilizes WebSockets to instantly push the generated QR ticket to the user's screen the millisecond Safaricom verifies the payment—no page refreshes required.
+* **🔒 Secure QR Ticketing:** Each ticket generates a unique, signed QR code linked to the database that can only be scanned once.
+* **📱 Gatekeeper Mode:** A dedicated API endpoint for event bouncers to scan and validate tickets in <1 second, instantly updating state to prevent double-entry.
 
 ---
 
@@ -24,8 +23,9 @@ The system follows a micro-service inspired architecture to separate concerns be
 
 ```mermaid
 graph TD
-    User[End User] -->|Browses Events| Client[React Frontend]
+    User[End User] -->|Browses Events| Client[Ionic React Frontend]
     Client -->|API Requests| API[FastAPI Backend]
+    API -.->|WebSocket: Real-time QR Delivery| Client
     
     subgraph Payment ["Payment Flow"]
     API -->|Initiate Payment| MPesa[Safaricom Daraja API]
@@ -41,11 +41,11 @@ graph TD
 ---
 
 ## Technical Decisions
-**FastAPI (Backend)**: Chosen for its asynchronous capabilities, essential for handling high-concurrency ticket sales and M-Pesa webhooks without blocking.
+**FastAPI (Backend)**: Chosen for its asynchronous capabilities, essential for handling high-concurrency ticket sales, M-Pesa webhooks, and live WebSocket connections without blocking.
 
-**PostgreSQ**L: Relational integrity was crucial for financial transactions (tickets/payments).
+**PostgreSQ**L: Relational integrity is crucial for preventing fraud in financial transactions and ticket states.
 
-**React + Tailwind**: Ensures a lightweight, mobile-responsive experience for users on low-bandwidth connections.
+**Ionic React**: Ensures a lightweight, cross-platform experience. The exact same codebase can run as a web app for buyers and be compiled into a native Android/iOS app for bouncers to use their camera scanners.
 
 ---
 
@@ -85,9 +85,10 @@ erDiagram
 
     TRANSACTIONS {
         int id PK
-        string mpesa_receipt "e.g. QWE123RTY"
+        string receipt_number "e.g. QWE123RTY (UNIQUE)"
         decimal amount
         string phone_number
+        string status
     }
 ```
 ---
@@ -103,16 +104,18 @@ erDiagram
 
 ## 🔌 API Documentation (Core Endpoints)
 ### 1. Payment & Ticketing
-```POST /api/tickets/purchase```: Initiates the M-Pesa STK Push.
+```POST /api/v1/pay```: Initiates the M-Pesa STK Push to the user's phone.
 
-    Payload:```{ "event_id": 12, "phone": "2547..." }```
+```POST /api/v1/callback```: (Critical) The webhook URL that Safaricom hits to confirm payment. Triggers DB transaction and QR generation.
 
-```POST /api/hooks/mpesa```: (Critical) The callback URL that Safaricom hits to confirm payment. Triggers ticket generation.
+```WS /api/v1/ws/{phone_number}```: Live WebSocket tunnel for pushing the ticket to the frontend.
+
+```GET /api/v1/ticket/{ticket_id}```: Serves the generated QR code image.
 
 ### 2. Validation (Gatekeeper)
-```GET /api/tickets/validate/{qr_hash}```: Checks if a ticket is valid.
+```POST /api/v1/scan```: Validates a scanned QR hash.
 
-     Logic: If status is ```VALID```, change to ```USED``` and return Success. If ```USED```, return Error (Duplicate Entry).
+     Logic: If status is ```VALID```, change to ```USED``` and grant entry. If ```USED```, deny entry (Duplicate Entry).
 
      ---
 ## 💻 Local Development Setup
@@ -146,30 +149,32 @@ npm run dev
 ---
 ### 3. Environment Variables (.env)
 Create a .env file in the backend folder:
-```DATABASE_URL=postgresql://user:pass@localhost/tukio_db
+```# Database
+DATABASE_URL=postgresql://user:pass@localhost/tukio_db
+
+# Safaricom Daraja API
 MPESA_CONSUMER_KEY=your_key
 MPESA_CONSUMER_SECRET=your_secret
+MPESA_SHORTCODE=174379
 MPESA_PASSKEY=your_passkey
-SECRET_KEY=your_jwt_secret
 ```
 ---
 ## 🚧 Project Roadmap
 
-### Phase 1: Core Architecture (Current Status)
+### Phase 1: Core Architecture (Completed)
 - [x] **Database Design:** Normalized schema for Users, Events, and Tickets.
 - [x] **Backend Setup:** FastAPI project structure with SQLAlchemy and Alembic migrations.
-- [x] **Authentication:** JWT-based login for Organizers and Staff.
-- [ ] **M-Pesa Integration:** Implement STK Push and Callback handling (Webhooks).
+- [x] **M-Pesa Integration:** Implement STK Push and Callback handling (Webhooks).
 
-### Phase 2: The Ticket Engine
-- [ ] **QR Service:** Generate cryptographically signed QR codes for each ticket.
-- [ ] **Validation API:** Endpoint for bouncers to scan and verify tickets.
-- [ ] **Email Service:** Auto-send tickets to users after payment confirmation.
+### Phase 2: The Ticket Engine (Completed)
+- [x] **QR Service:** Generate cryptographically signed QR codes for each ticket.
+- [x] **Validation API:** Endpoint for bouncers to scan and verify tickets, preventing fraud.
+- [x] **Real-Time Delivery:** Implement WebSockets to push tickets to the UI instantly.
 
-### Phase 3: Frontend & UI
+### Phase 3: Frontend & UI (In Progress)
+- [x] **Public Event Page:** Mobile-responsive Ionic React checkout flow.
+- [ ] **Gatekeeper App:** Native camera scanner integration for bouncers.
 - [ ] **Organizer Dashboard:** React charts showing sales and revenue.
-- [ ] **Public Event Page:** Mobile-responsive page for users to buy tickets.
-- [ ] **Gatekeeper App:** Simple mobile view for scanning QR codes at the door.
 
 ---
 
